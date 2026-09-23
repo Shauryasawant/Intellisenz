@@ -3,18 +3,33 @@ services:
     image: timescale/timescaledb:latest-pg17
     container_name: intellisenz-db
     restart: unless-stopped
-
     environment:
       POSTGRES_DB: intellisenz
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-
     ports:
-      - "5432:5432"
-
+    - "5433:5432"
     volumes:
       - timescaledb_data:/var/lib/postgresql/data
 
+  influxdb:
+    image: influxdb:2.7
+    container_name: intellisenz-influx
+    restart: unless-stopped
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: adminpassword
+      DOCKER_INFLUXDB_INIT_ORG: intellisenz
+      DOCKER_INFLUXDB_INIT_BUCKET: sensors
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-token
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
 volumes:
   timescaledb_data:
+  influxdb_data:
   #docker exec -it intellisenz-db psql -U postgres -d intellisenz
+  #docker exec -it intellisenz-influx influx setup --host http://localhost:8086 --bucket sensors --org intellisenz --token my-token --username admin --password adminpassword --force

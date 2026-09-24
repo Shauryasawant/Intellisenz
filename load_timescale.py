@@ -59,7 +59,8 @@ def create_table(connection) -> None:
 
 def load_csv(connection) -> None:
     """
-    Read the CSV and insert each row into TimescaleDB.
+    Replace the existing sensor_data contents
+    with the latest CSV data.
     """
 
     with open(
@@ -75,12 +76,14 @@ def load_csv(connection) -> None:
 
         with connection.cursor() as cursor:
 
+            # Remove previous batch
+            cursor.execute("TRUNCATE TABLE sensor_data;")
+
             for row in reader:
 
                 timestamp = row.pop("time")
                 measurement = row.pop("measurement", None)
 
-                # Convert timestamp string into datetime
                 timestamp = datetime.fromisoformat(
                     timestamp.replace("Z", "+00:00")
                 )

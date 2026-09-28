@@ -1,0 +1,228 @@
+{
+  "RFM": {
+    "overall": {
+      "rows": 106688,
+      "parse_error_rate": 0.004667816436712657,
+      "bad_device_clock_rate": 0.03164367126574685,
+      "all_zero_row_rate": 0.005033368326334733,
+      "time_start": "2026-09-01 06:30:04.809920+00:00",
+      "time_end": "2026-09-24 07:37:28.116426+00:00",
+      "time_span": "23 days 01:07:23.306506",
+      "median_interval_s": 3.281646,
+      "gaps_over_10x": 273,
+      "duplicate_timestamps": 0,
+      "unknown_sensor_rate": 0.0008904469106178764
+    },
+    "per_sensor": {
+      "D001": {
+        "rows": 282,
+        "parse_error_rate": 0.8971631205673759,
+        "bad_device_clock_rate": 0.8900709219858156,
+        "all_zero_row_rate": 0.8971631205673759,
+        "time_start": "2026-09-01 06:46:04.919285+00:00",
+        "time_end": "2026-09-11 09:41:37.272660+00:00",
+        "time_span": "10 days 02:55:32.353375",
+        "median_interval_s": 10.034422,
+        "gaps_over_10x": 4,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0001": {
+        "rows": 18416,
+        "parse_error_rate": 0.0055386620330147695,
+        "bad_device_clock_rate": 0.01629018245004344,
+        "all_zero_row_rate": 0.006896177237185056,
+        "time_start": "2026-09-01 06:52:12.946354+00:00",
+        "time_end": "2026-09-22 10:58:02.487098+00:00",
+        "time_span": "21 days 04:05:49.540744",
+        "median_interval_s": 10.140731,
+        "gaps_over_10x": 147,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0002": {
+        "rows": 28659,
+        "parse_error_rate": 0.0003140374751386999,
+        "bad_device_clock_rate": 0.00024425136955232214,
+        "all_zero_row_rate": 0.0003140374751386999,
+        "time_start": "2026-09-10 05:19:03.569210+00:00",
+        "time_end": "2026-09-23 09:57:28.186617+00:00",
+        "time_span": "13 days 04:38:24.617407",
+        "median_interval_s": 10.241234,
+        "gaps_over_10x": 268,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0003": {
+        "rows": 9600,
+        "parse_error_rate": 0.005625,
+        "bad_device_clock_rate": 0.013854166666666667,
+        "all_zero_row_rate": 0.005625,
+        "time_start": "2026-09-10 05:30:11.623338+00:00",
+        "time_end": "2026-09-24 07:37:28.116426+00:00",
+        "time_span": "14 days 02:07:16.493088",
+        "median_interval_s": 11.454551,
+        "gaps_over_10x": 132,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0004": {
+        "rows": 38561,
+        "parse_error_rate": 0.0004927258110526179,
+        "bad_device_clock_rate": 0.0009076528098337699,
+        "all_zero_row_rate": 0.00046679287362879593,
+        "time_start": "2026-09-11 11:13:34.019463+00:00",
+        "time_end": "2026-09-23 12:56:23.223203+00:00",
+        "time_span": "12 days 01:42:49.203740",
+        "median_interval_s": 10.119318499999999,
+        "gaps_over_10x": 181,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0005": {
+        "rows": 5359,
+        "parse_error_rate": 0.005598059339428998,
+        "bad_device_clock_rate": 0.41220376935995523,
+        "all_zero_row_rate": 0.005598059339428998,
+        "time_start": "2026-09-11 11:47:53.228198+00:00",
+        "time_end": "2026-09-23 11:29:41.212342+00:00",
+        "time_span": "11 days 23:41:47.984144",
+        "median_interval_s": 9.8354205,
+        "gaps_over_10x": 29,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0006": {
+        "rows": 4954,
+        "parse_error_rate": 0.0044408558740411785,
+        "bad_device_clock_rate": 0.07387969317723052,
+        "all_zero_row_rate": 0.0044408558740411785,
+        "time_start": "2026-09-22 09:05:51.372366+00:00",
+        "time_end": "2026-09-23 12:41:17.624105+00:00",
+        "time_span": "1 days 03:35:26.251739",
+        "median_interval_s": 7.81565,
+        "gaps_over_10x": 11,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0007": {
+        "rows": 23,
+        "parse_error_rate": 0.2608695652173913,
+        "bad_device_clock_rate": 0.0,
+        "all_zero_row_rate": 0.9130434782608695,
+        "time_start": "2026-09-22 09:36:13.697845+00:00",
+        "time_end": "2026-09-22 09:51:20.872442+00:00",
+        "time_span": "0 days 00:15:07.174597",
+        "median_interval_s": 17.7652585,
+        "gaps_over_10x": 1,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0010": {
+        "rows": 739,
+        "parse_error_rate": 0.0013531799729364006,
+        "bad_device_clock_rate": 0.09472259810554803,
+        "all_zero_row_rate": 0.0013531799729364006,
+        "time_start": "2026-09-23 11:33:52.403521+00:00",
+        "time_end": "2026-09-23 12:53:08.730543+00:00",
+        "time_span": "0 days 01:19:16.327022",
+        "median_interval_s": 6.514725,
+        "gaps_over_10x": 3,
+        "duplicate_timestamps": 0
+      },
+      "UNKNOWN": {
+        "rows": 95,
+        "parse_error_rate": 0.021052631578947368,
+        "bad_device_clock_rate": 0.05263157894736842,
+        "all_zero_row_rate": 0.021052631578947368,
+        "time_start": "2026-09-01 06:30:04.809920+00:00",
+        "time_end": "2026-09-23 10:44:57.080841+00:00",
+        "time_span": "22 days 04:14:52.270921",
+        "median_interval_s": 10.03836,
+        "gaps_over_10x": 3,
+        "duplicate_timestamps": 0
+      }
+    }
+  },
+  "RFL": {
+    "overall": {
+      "rows": 39700,
+      "parse_error_rate": 0.6274811083123426,
+      "bad_device_clock_rate": 0.2365743073047859,
+      "all_zero_row_rate": 0.3556171284634761,
+      "time_start": "2026-08-26 11:31:26.149090+00:00",
+      "time_end": "2026-09-18 05:51:27.123093+00:00",
+      "time_span": "22 days 18:20:00.974003",
+      "median_interval_s": 2.991616,
+      "gaps_over_10x": 106,
+      "duplicate_timestamps": 0,
+      "unknown_sensor_rate": 0.07591939546599497
+    },
+    "per_sensor": {
+      "D001": {
+        "rows": 7700,
+        "parse_error_rate": 0.9715584415584415,
+        "bad_device_clock_rate": 0.9906493506493507,
+        "all_zero_row_rate": 0.9462337662337662,
+        "time_start": "2026-08-31 06:35:38.551754+00:00",
+        "time_end": "2026-09-08 10:14:35.475092+00:00",
+        "time_span": "8 days 03:38:56.923338",
+        "median_interval_s": 2.970792,
+        "gaps_over_10x": 11,
+        "duplicate_timestamps": 0
+      },
+      "D012": {
+        "rows": 1167,
+        "parse_error_rate": 1.0,
+        "bad_device_clock_rate": 1.0,
+        "all_zero_row_rate": 1.0,
+        "time_start": "2026-09-08 09:44:17.844951+00:00",
+        "time_end": "2026-09-15 07:48:27.462599+00:00",
+        "time_span": "6 days 22:04:09.617648",
+        "median_interval_s": 2.9710884999999996,
+        "gaps_over_10x": 1,
+        "duplicate_timestamps": 0
+      },
+      "RFL_01": {
+        "rows": 27487,
+        "parse_error_rate": 0.4699312402226507,
+        "bad_device_clock_rate": 0.008112926110524976,
+        "all_zero_row_rate": 0.12507730927347474,
+        "time_start": "2026-08-27 11:34:52.618754+00:00",
+        "time_end": "2026-09-18 05:51:27.123093+00:00",
+        "time_span": "21 days 18:16:34.504339",
+        "median_interval_s": 3.1413504999999997,
+        "gaps_over_10x": 71,
+        "duplicate_timestamps": 0
+      },
+      "RFM_0001": {
+        "rows": 77,
+        "parse_error_rate": 1.0,
+        "bad_device_clock_rate": 1.0,
+        "all_zero_row_rate": 1.0,
+        "time_start": "2026-09-03 08:56:48.964623+00:00",
+        "time_end": "2026-09-03 09:13:54.849795+00:00",
+        "time_span": "0 days 00:17:05.885172",
+        "median_interval_s": 2.973991,
+        "gaps_over_10x": 3,
+        "duplicate_timestamps": 0
+      },
+      "RTC Error": {
+        "rows": 255,
+        "parse_error_rate": 1.0,
+        "bad_device_clock_rate": 1.0,
+        "all_zero_row_rate": 0.996078431372549,
+        "time_start": "2026-08-26 11:32:11.446517+00:00",
+        "time_end": "2026-09-10 06:31:36.765717+00:00",
+        "time_span": "14 days 18:59:25.319200",
+        "median_interval_s": 5.0229175,
+        "gaps_over_10x": 13,
+        "duplicate_timestamps": 0
+      },
+      "UNKNOWN": {
+        "rows": 3014,
+        "parse_error_rate": 1.0,
+        "bad_device_clock_rate": 0.013934970139349702,
+        "all_zero_row_rate": 0.6290643662906437,
+        "time_start": "2026-08-26 11:31:26.149090+00:00",
+        "time_end": "2026-08-27 11:33:50.013254+00:00",
+        "time_span": "1 days 00:02:23.864164",
+        "median_interval_s": 2.992983,
+        "gaps_over_10x": 18,
+        "duplicate_timestamps": 0
+      }
+    }
+  }
+}

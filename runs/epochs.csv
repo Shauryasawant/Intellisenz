@@ -1,0 +1,2 @@
+segment,epoch,start,end,sessions,windows,ref_u,ref_v,quiet_max_shift,margin_x,evaluated
+RFM_0002_s1,0,09-18 20:45,09-21 11:41,18,180,0.008,-0.008,0.108,1.1,True

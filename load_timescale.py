@@ -1,7 +1,8 @@
 """
 load_timescale.py
 
-Reads sensor data from influx_data.csv and stores it in TimescaleDB.
+Reads the raw sensor export (influx_data.csv), runs it through the preprocessing
+module, and stores the result in TimescaleDB.
 
 Database:
     PostgreSQL / TimescaleDB
@@ -10,12 +11,16 @@ Usage:
     python load_timescale.py
 """
 
-import csv
 import logging
-from datetime import datetime
 
 import psycopg2
 from psycopg2 import extras
+
+from intellisenz.preprocess.preprocessing import (
+    frame_to_records,
+    load_raw_export,
+    preprocess_raw_export,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -57,69 +62,66 @@ def create_table(connection) -> None:
     logger.info("Table sensor_data is ready.")
 
 
-def load_csv(connection) -> None:
+def build_records(csv_file: str = CSV_FILE) -> list:
     """
-    Replace the existing sensor_data contents
-    with the latest CSV data.
+    Read the CSV and preprocess it into (time, measurement, data) tuples.
     """
 
-    with open(
-        CSV_FILE,
-        "r",
-        newline="",
-        encoding="utf-8"
-    ) as file:
+    df_raw = load_raw_export(csv_file)
+    frames = preprocess_raw_export(df_raw)
 
-        reader = csv.DictReader(file)
+    records = []
+    for measurement, frame in frames.items():
+        if frame.empty:
+            logger.info("No %s rows found; skipping this device type.", measurement)
+            continue
+        records.extend(frame_to_records(frame))
 
-        rows_inserted = 0
+    records.sort(key=lambda r: r[0])
+    return records
 
+
+def load_records(connection, records: list) -> None:
+    """
+    Replace the existing sensor_data contents with the latest records.
+    Runs in a single transaction, so a failure leaves the old data intact.
+    """
+
+    try:
         with connection.cursor() as cursor:
 
             # Remove previous batch
             cursor.execute("TRUNCATE TABLE sensor_data;")
 
-            for row in reader:
-
-                timestamp = row.pop("time")
-                measurement = row.pop("measurement", None)
-
-                timestamp = datetime.fromisoformat(
-                    timestamp.replace("Z", "+00:00")
-                )
-
-                cursor.execute(
-                    """
-                    INSERT INTO sensor_data (
-                        time,
-                        measurement,
-                        data
-                    )
-                    VALUES (%s, %s, %s);
-                    """,
-                    (
-                        timestamp,
-                        measurement,
-                        extras.Json(row),
-                    )
-                )
-
-                rows_inserted += 1
+            extras.execute_values(
+                cursor,
+                "INSERT INTO sensor_data (time, measurement, data) VALUES %s",
+                [(ts, measurement, extras.Json(data)) for ts, measurement, data in records],
+                page_size=1000,
+            )
 
         connection.commit()
 
+    except Exception:
+        connection.rollback()
+        raise
+
     logger.info(
-        f"Inserted {rows_inserted} record(s) into TimescaleDB."
+        f"Inserted {len(records)} record(s) into TimescaleDB."
     )
 
 
 def main() -> None:
 
+    records = build_records()
+    if not records:
+        raise RuntimeError("No valid sensor records found; database was not modified.")
+
     connection = psycopg2.connect(**DB_CONFIG)
 
     try:
         create_table(connection)
-        load_csv(connection)
+        load_records(connection, records)
 
     finally:
         connection.close()

@@ -51,7 +51,7 @@ from sklearn.preprocessing import RobustScaler
 
 logger = logging.getLogger("shm_v2")
 ACC = ["acc_x", "acc_y", "acc_z"]
-TEX = ["slope_u", "slope_v", "norm", "log_std"]
+TEX = ["slope_u", "slope_v", "log_std"]
 _EPOCH = pd.Timestamp("1970-01-01", tz="UTC")
 
 
@@ -76,6 +76,7 @@ class Cfg:
     ref_agree_deg: float = 0.10
     floor_deg: float = 0.12
     persist_sessions: int = 2
+    prearm_check: bool = False     # flag sessions BEFORE the reference that differ from it (step during arming)
     # texture channel
     q: float = 0.995
     persist: int = 2
@@ -98,6 +99,9 @@ def clean_rfm(df: pd.DataFrame) -> pd.DataFrame:
             d = d[~d[c].fillna(False).astype(bool)]
     d = d[d["sensor_id"].astype(str).str.match(r"^RFM_\d+$")]
     d = d.dropna(subset=["server_time", *ACC])
+    before = len(d)
+    d = d.drop_duplicates(subset=["sensor_id", "server_time"])
+    logger.info("dropped %d duplicate rows", before - len(d))
     return d.sort_values(["sensor_id", "server_time"]).reset_index(drop=True)
 
 
@@ -231,6 +235,16 @@ def run_session_detector(S: pd.DataFrame, cfg: Cfg, rebaseline: bool) -> pd.Data
         ru, rv, last, first = arm
         state[pos:first] = "SETTLING"
         epoch[pos:first] = -1
+        if cfg.prearm_check:
+            run = []
+            for j in [x for x in range(pos, first) if n[x] >= cfg.min_win] + [None]:
+                if j is not None and np.hypot(u[j] - ru, v[j] - rv) > cfg.floor_deg:
+                    run.append(j)
+                    continue
+                if len(run) >= cfg.persist_sessions:
+                    state[run[-1]] = "PREARM_SHIFT"
+                    shift[run[-1]] = np.hypot(u[run[-1]] - ru, v[run[-1]] - rv)
+                run = []
         state[first:last + 1] = "BASE"
         epoch[first:last + 1] = ep
         refu[first:], refv[first:] = ru, rv
@@ -387,12 +401,14 @@ def evaluate(F: pd.DataFrame, cfg: Cfg):
 # 5. orchestration
 # ---------------------------------------------------------------------------
 
-def run_all(rfm_df: pd.DataFrame, cfg: Cfg | None = None, out_dir="runs") -> dict:
+def run_all(rfm_df: pd.DataFrame, cfg: Cfg | None = None, out_dir="runs", sensors=None) -> dict:
     cfg = cfg or Cfg()
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     np.random.seed(cfg.seed)
     d = clean_rfm(rfm_df)
+    if sensors:
+        d = d[d["sensor_id"].isin(sensors)]
 
     seg_rows, epoch_rows, event_rows, evals, summary = [], [], [], {}, {}
     for sid, g in d.groupby("sensor_id"):
@@ -411,8 +427,9 @@ def run_all(rfm_df: pd.DataFrame, cfg: Cfg | None = None, out_dir="runs") -> dic
                              "end": F.index[-1].tz_convert(cfg.tz).strftime("%m-%d %H:%M"),
                              "sessions": len(S), "unarmed/settling": int(S.state.isin(["UNARMED", "SETTLING"]).sum()),
                              "events": int((S.state == "EVENT").sum())})
-            for _, r in S[S.state == "EVENT"].iterrows():
-                event_rows.append({"segment": name, "when_IST": r["t"].tz_convert(cfg.tz).strftime("%Y-%m-%d %H:%M"),
+            for _, r in S[S.state.isin(["EVENT", "PREARM_SHIFT"])].iterrows():
+                event_rows.append({"segment": name, "kind": r["state"],
+                                   "when_IST": r["t"].tz_convert(cfg.tz).strftime("%Y-%m-%d %H:%M"),
                                    "shift_deg": round(float(r["shift_deg"]), 3) if pd.notna(r["shift_deg"]) else np.nan,
                                    "windows": int(r["n"])})
             latest_bundle = None
@@ -426,6 +443,7 @@ def run_all(rfm_df: pd.DataFrame, cfg: Cfg | None = None, out_dir="runs") -> dic
                        "end": Se["t"].iloc[-1].tz_convert(cfg.tz).strftime("%m-%d %H:%M"),
                        "sessions": len(Se), "windows": len(Fe),
                        "ref_u": round(float(Se.ref_u.iloc[0]), 3), "ref_v": round(float(Se.ref_v.iloc[0]), 3),
+                       "g_x": round(float(ref[0]), 6), "g_y": round(float(ref[1]), 6), "g_z": round(float(ref[2]), 6),
                        "quiet_max_shift": round(mx, 3),
                        "margin_x": round(cfg.floor_deg / mx, 1) if mx > 0 else np.inf}
                 if len(Se) >= cfg.min_epoch_sessions and len(Fe) >= 80:
@@ -452,6 +470,8 @@ def run_all(rfm_df: pd.DataFrame, cfg: Cfg | None = None, out_dir="runs") -> dic
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--sensors", nargs="*", default=None, help="only these sensor ids, e.g. RFM_0002 RFM_0003")
+
     ap.add_argument("--csv", required=True)
     ap.add_argument("--out", default="runs")
     ap.add_argument("--floor", type=float, default=Cfg.floor_deg, help="level-shift alarm threshold, degrees")
@@ -461,7 +481,7 @@ def main():
     from intellisenz.preprocess.preprocessing import load_raw_export, preprocess_raw_export
 
     rfm = preprocess_raw_export(load_raw_export(args.csv))["RFM"]
-    res = run_all(rfm, Cfg(floor_deg=args.floor), args.out)
+    res = run_all(rfm, Cfg(floor_deg=args.floor, prearm_check=True), args.out, sensors=args.sensors)
     pd.set_option("display.width", 220)
     print("\n=== orientation segments (re-mounts split here) ===")
     print(res["segments"].to_string(index=False) if len(res["segments"]) else "none")

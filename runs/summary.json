@@ -16,6 +16,7 @@
     "ref_agree_deg": 0.1,
     "floor_deg": 0.12,
     "persist_sessions": 2,
+    "prearm_check": true,
     "q": 0.995,
     "persist": 2,
     "norm_tol": 0.1,
@@ -25,11 +26,18 @@
     "seed": 0
   },
   "deploy": {
-    "RFM_0002_s1": {
+    "RFM_0002_s4": {
+      "deploy_epoch": 1,
+      "level_ref": [
+        -0.074,
+        -0.008
+      ]
+    },
+    "RFM_0003_s3": {
       "deploy_epoch": 0,
       "level_ref": [
-        0.008,
-        -0.008
+        0.491,
+        -0.363
       ]
     }
   }

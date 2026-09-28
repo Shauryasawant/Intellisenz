@@ -91,7 +91,7 @@ def load_records(connection, records: list) -> None:
         with connection.cursor() as cursor:
 
             # Remove previous batch
-            cursor.execute("TRUNCATE TABLE sensor_data;")
+            #cursor.execute("TRUNCATE TABLE sensor_data;")
 
             extras.execute_values(
                 cursor,

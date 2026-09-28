@@ -99,7 +99,7 @@ def main() -> None:
 
         flux_query = f"""
             from(bucket: "{settings.bucket}")
-                |> range(start: -1d)
+                |> range(start: -31d)
                 |> pivot(
                     rowKey: ["_time"],
                     columnKey: ["_field"],

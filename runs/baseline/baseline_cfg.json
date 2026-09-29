@@ -1,0 +1,24 @@
+{
+  "session_gap_s": 120,
+  "min_session_n": 10,
+  "settle_h": 6.0,
+  "cut_deg": 0.3,
+  "ref_sessions": 2,
+  "norm_tol": 0.3,
+  "k_mad": 5.0,
+  "floor_deg": 0.2,
+  "fixed_deg": 0.5,
+  "persist": 2,
+  "train_frac": 0.5,
+  "min_epoch": 8,
+  "min_train": 3,
+  "min_test": 3,
+  "steps_deg": [
+    0.15,
+    0.2,
+    0.3,
+    0.5,
+    1.0,
+    2.0
+  ]
+}

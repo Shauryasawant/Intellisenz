@@ -11,9 +11,12 @@ src/intellisenz/data/__init__.py
 src/intellisenz/evaluation/__init__.py
 src/intellisenz/features/__init__.py
 src/intellisenz/inference/__init__.py
+src/intellisenz/models/SHM_models.py
+src/intellisenz/models/SHM_modelv2.py
 src/intellisenz/models/__init__.py
-src/intellisenz/models/lstm.py
+src/intellisenz/models/baseline.py
 src/intellisenz/preprocess/__init__.py
 src/intellisenz/preprocess/audit.py
 src/intellisenz/preprocess/preprocessing.py
 src/intellisenz/training/__init__.py
+test/test_data.py

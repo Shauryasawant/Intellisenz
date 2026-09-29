@@ -7,16 +7,12 @@ the SAME basis v2 uses (_basis below is copied from shm_models_v2):
 
     r  ~  g + tan(ref_u) * u + tan(ref_v) * v          (then normalised)
 
-REQUIRED ONE-TIME EDIT in shm_models_v2.py, inside run_all(), in the `row = {...}` dict for epochs,
-right after the line   "ref_u": ..., "ref_v": ...,   add:
-
-    "g_x": round(float(ref[0]), 6), "g_y": round(float(ref[1]), 6), "g_z": round(float(ref[2]), 6),
-
-Re-run v2 once; epochs.csv then carries the columns this module reads.
-
 Use
-    from fast_refs import load_fast_alarms, replay
-    alarms = load_fast_alarms("runs/epochs.csv", "runs/segments.csv")   # {sensor_id: FastAlarm}
+    from fast_refs import latest_segment_numbers, load_fast_alarms, replay
+    from intellisenz.models.SHM_modelv2 import Cfg, clean_rfm
+    d = clean_rfm(rfm)
+    latest_seg = latest_segment_numbers(d, Cfg())
+    alarms = load_fast_alarms("runs/epochs.csv", latest_seg=latest_seg)
     a = alarms["RFM_0002"].update(server_time_seconds, (ax, ay, az))    # on every incoming reading
 
     # sanity check on history BEFORE going live (counts alerts the healthy data would have caused):
@@ -29,6 +25,7 @@ import numpy as np
 import pandas as pd
 
 from realtime_alarm import FastAlarm
+from intellisenz.models.SHM_modelv2 import Cfg, clean_rfm, split_segments
 
 
 def _basis(ref: np.ndarray):                      # identical to shm_models_v2._basis
@@ -52,13 +49,27 @@ def thresholds_from_quiet(quiet_max_shift_deg: float | None, floor_deg: float = 
     wobble by a wide margin (synthetic test: 0.12 deg floor vs 0.04 deg/axis wobble => ~10% of healthy sessions
     false-alarmed; 0.2 deg => ~0.2%)."""
     q = float(quiet_max_shift_deg) if quiet_max_shift_deg and np.isfinite(quiet_max_shift_deg) else 0.0
+    # SMALL_STEP is advisory only; quiet shifts can exceed the 0.20 degree floor.
     return {"small_deg": max(0.20, 3.0 * q), "step_deg": max(0.50, 8.0 * q), "event_deg": 2.0}
 
 
-def load_fast_alarms(epochs_csv: str, segments_csv: str | None = None, **overrides) -> dict[str, FastAlarm]:
-    """One FastAlarm per sensor, built from the sensor's LATEST segment and its latest armed epoch.
-    A sensor whose latest segment has no armed epoch yet (e.g. just re-mounted) gets ref_vec=None: it is then
-    watched only by SESSION_STEP (change inside a session) until v2 arms a reference."""
+def latest_segment_numbers(d: pd.DataFrame, cfg: Cfg) -> dict[str, int]:
+    """Find each sensor's latest orientation segment from cleaned raw readings."""
+    out = {}
+    for sid, g in d.groupby("sensor_id"):
+        gs = split_segments(g.reset_index(drop=True), cfg)
+        if len(gs):
+            out[sid] = int(gs.segment.max()) + 1
+    return out
+
+
+def load_fast_alarms(epochs_csv: str, latest_seg: dict[str, int] | None = None,
+                     **overrides) -> dict[str, FastAlarm]:
+    """Build one alarm per sensor using the raw-data latest segment when provided.
+
+    A latest segment without a modeled epoch gets ref_vec=None and is watched only by
+    SESSION_STEP until the model has armed a reference for that mounting.
+    """
     ep = pd.read_csv(epochs_csv)
     need = {"g_x", "g_y", "g_z", "ref_u", "ref_v"}
     if not need <= set(ep.columns):
@@ -67,17 +78,16 @@ def load_fast_alarms(epochs_csv: str, segments_csv: str | None = None, **overrid
     ep["sensor"] = ep["segment"].str.rsplit("_s", n=1).str[0]
     ep["seg_no"] = ep["segment"].str.rsplit("_s", n=1).str[1].astype(int)
 
-    latest_seg = {}
-    if segments_csv:
-        sg = pd.read_csv(segments_csv)
-        sg["sensor"] = sg["segment"].str.rsplit("_s", n=1).str[0]
-        sg["seg_no"] = sg["segment"].str.rsplit("_s", n=1).str[1].astype(int)
-        latest_seg = sg.groupby("sensor")["seg_no"].max().to_dict()
+    latest_from_epochs = ep.groupby("sensor")["seg_no"].max().to_dict()
+    selected_segments = latest_from_epochs if latest_seg is None else latest_seg
 
     out = {}
-    for sensor in sorted(set(ep["sensor"]) | set(latest_seg)):
+    for sensor in sorted(set(ep["sensor"]) | set(selected_segments)):
         e = ep[ep["sensor"] == sensor]
-        newest = latest_seg.get(sensor, int(e["seg_no"].max()) if len(e) else None)
+        newest = selected_segments.get(sensor)
+        if newest is None:
+            out[sensor] = FastAlarm(None, **overrides)
+            continue
         e = e[e["seg_no"] == newest]
         if e.empty:                                   # newest segment exists but never armed
             out[sensor] = FastAlarm(None, **overrides)

@@ -24,10 +24,12 @@ RFL packet layouts seen in real data (see parse_payload):
 
 from __future__ import annotations
 
+import argparse
 import logging
 import math
 import re
 from datetime import date, datetime, time as dtime
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -678,3 +680,28 @@ def frame_to_records(df: pd.DataFrame) -> list[tuple[datetime, str, dict]]:
     if skipped:
         logger.warning("Skipped %d row(s) with unparseable server time.", skipped)
     return records
+
+
+def main() -> None:
+    """Parse a raw export and write one parquet file per supported device type."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("csv", help="raw InfluxDB export: device, site, time, value")
+    parser.add_argument(
+        "--save-parquet",
+        default="parsed_output",
+        help="directory for rfm.parquet and rfl.parquet (default: parsed_output)",
+    )
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s  %(message)s")
+    frames = preprocess_raw_export(load_raw_export(args.csv))
+    output_dir = Path(args.save_parquet)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for device_type, frame in frames.items():
+        path = output_dir / f"{device_type.lower()}.parquet"
+        frame.to_parquet(path, index=False)
+        logger.info("Wrote %d %s rows to %s", len(frame), device_type, path)
+
+
+if __name__ == "__main__":
+    main()

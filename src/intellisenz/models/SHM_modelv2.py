@@ -66,7 +66,7 @@ class Cfg:
     seg_tol_deg: float = 2.0        # gravity-direction change between sessions that means "re-mounted"
     min_session_n: int = 30         # samples; shorter sessions are handling/transit
     settle_h: float = 6.0           # drop after a segment starts
-    sample_norm_tol: float = 0.30
+    sample_norm_tol: float = 0.04
     ref_dir_h: float = 24.0         # hours used for the segment's gravity direction
     min_seg_windows: int = 60
     # level channel
@@ -149,9 +149,13 @@ def build_windows(times, t, du, dv, norm, acc, cfg: Cfg):
         tt = (t[idx] - t[idx[0]]) / 3600.0
         if tt[-1] <= 0:
             continue
+        a = acc[idx]
+        d = np.linalg.norm(a - np.median(a, axis=0), axis=1)
+        keep = d <= max(0.05, 4 * 1.4826 * np.median(d))
+        astd = a[keep].std(axis=0).max()
         rows.append((du[idx].mean(), dv[idx].mean(),
                      np.polyfit(tt, du[idx], 1)[0], np.polyfit(tt, dv[idx], 1)[0],
-                     norm[idx].mean(), acc[idx].std(axis=0).max(), len(idx), sess[idx[0]]))
+                     np.median(norm[idx]), astd, len(idx), sess[idx[0]]))
         starts.append(idx[0])
     if not rows:
         return None
@@ -427,7 +431,12 @@ def run_all(rfm_df: pd.DataFrame, cfg: Cfg | None = None, out_dir="runs", sensor
                              "end": F.index[-1].tz_convert(cfg.tz).strftime("%m-%d %H:%M"),
                              "sessions": len(S), "unarmed/settling": int(S.state.isin(["UNARMED", "SETTLING"]).sum()),
                              "events": int((S.state == "EVENT").sum())})
-            for _, r in S[S.state.isin(["EVENT", "PREARM_SHIFT"])].iterrows():
+            prearm_cutoff = gs["server_time"].iloc[0] + pd.Timedelta(hours=24)
+            field_events = S[
+                (S.state == "EVENT")
+                | ((S.state == "PREARM_SHIFT") & (S.t >= prearm_cutoff))
+            ]
+            for _, r in field_events.iterrows():
                 event_rows.append({"segment": name, "kind": r["state"],
                                    "when_IST": r["t"].tz_convert(cfg.tz).strftime("%Y-%m-%d %H:%M"),
                                    "shift_deg": round(float(r["shift_deg"]), 3) if pd.notna(r["shift_deg"]) else np.nan,

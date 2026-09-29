@@ -1,0 +1,44 @@
+{
+  "cfg": {
+    "window_s": 300,
+    "min_n": 20,
+    "session_gap_s": 120,
+    "min_win": 3,
+    "seg_tol_deg": 2.0,
+    "min_session_n": 30,
+    "settle_h": 6.0,
+    "sample_norm_tol": 0.04,
+    "ref_dir_h": 24.0,
+    "min_seg_windows": 60,
+    "ref_min_sessions": 4,
+    "ref_min_h": 12.0,
+    "ref_max_h": 72.0,
+    "ref_agree_deg": 0.1,
+    "floor_deg": 0.12,
+    "persist_sessions": 2,
+    "prearm_check": true,
+    "q": 0.995,
+    "persist": 2,
+    "norm_tol": 0.1,
+    "min_epoch_sessions": 10,
+    "test_frac": 0.3,
+    "tz": "Asia/Kolkata",
+    "seed": 0
+  },
+  "deploy": {
+    "RFM_0002_s4": {
+      "deploy_epoch": 1,
+      "level_ref": [
+        -0.074,
+        -0.008
+      ]
+    },
+    "RFM_0003_s3": {
+      "deploy_epoch": 0,
+      "level_ref": [
+        0.491,
+        -0.363
+      ]
+    }
+  }
+}

@@ -230,7 +230,32 @@ def level_flags(F: pd.DataFrame, cfg: Cfg3, sigma_q=None, drift_thr=None, arm_un
 # fused model (texture + sensor from v2, level + drift from v3)
 # ---------------------------------------------------------------------------
 
+def quick_check(F: pd.DataFrame, calib_end: int, cfg: Cfg3, z_fast: float = 6.0, lookback: int = 12) -> np.ndarray:
+    """PRODUCTION FAST LANE: per-WINDOW (5-min) check -- no waiting for a full session to close. Each window is
+    compared to the median of the `lookback` windows immediately before it (a short recent rolling baseline, not
+    a long fixed one), so genuine slow drift already present in the segment does not itself look anomalous.
+    Flags the moment a window is z_fast robust-sigmas from that recent baseline. This trades a somewhat higher
+    false-alarm rate for latency measured in minutes instead of the hours the session-level channel can take
+    when a fault lands mid-session. Use ALONGSIDE the session-level channel, not instead of it.
+    `calib_end` sets where monitoring starts (skip until at least `lookback` clean windows exist)."""
+    du, dv = F["dev_u"].to_numpy(), F["dev_v"].to_numpy()
+    n = len(F)
+    flag = np.zeros(n, dtype=bool)
+    start = max(calib_end, lookback)
+    for j in range(start, n):
+        win_u, win_v = du[j - lookback:j], dv[j - lookback:j]
+        bu, bv = np.median(win_u), np.median(win_v)
+        su = max(cfg.sigma_min, _mad(win_u))
+        sv = max(cfg.sigma_min, _mad(win_v))
+        if abs(du[j] - bu) / su > z_fast or abs(dv[j] - bv) / sv > z_fast:
+            flag[j] = True
+    return flag
+
+
 def fuse(F: pd.DataFrame, tex_model: v2.Model, cfg: Cfg3, sigma_q=None, drift_thr=None, arm_until=None) -> pd.DataFrame:
+    lf = level_flags(F, cfg, sigma_q, drift_thr, arm_until)
+    sc = tex_model.score(F, lf["alarm"].to_numpy())
+
     lf = level_flags(F, cfg, sigma_q, drift_thr, arm_until)
     sc = tex_model.score(F, lf["alarm"].to_numpy())
     sc["flag_drift"] = lf["drift"].to_numpy()

@@ -52,23 +52,23 @@
   ],
   "segments": [
     {
-      "id": "RFM_0001_s14",
+      "id": "RFM_0001_s12",
       "kind": "tilt",
       "unit": "deg",
-      "segment": "RFM_0001_s14",
+      "segment": "RFM_0001_s12",
       "sessions": 14,
       "monitored": 8,
       "unarmed/settling": 6,
       "events": [
         {
-          "segment": "RFM_0001_s14",
+          "segment": "RFM_0001_s12",
           "kind": "DRIFT",
           "when_IST": "2026-09-15 11:45",
           "shift_deg": 0.925,
           "drift_deg_day": 1.227
         },
         {
-          "segment": "RFM_0001_s14",
+          "segment": "RFM_0001_s12",
           "kind": "EVENT",
           "when_IST": "2026-09-15 12:23",
           "shift_deg": 2.135,

@@ -33,7 +33,7 @@ CSV_FILE = "influx_data.csv"
 
 DB_CONFIG = {
     "host": "localhost",
-    "port": 5433,
+    "port": 5432,
     "database": "intellisenz",
     "user": "postgres",
     "password": "postgres",

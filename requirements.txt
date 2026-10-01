@@ -15,3 +15,9 @@ torch>=2.0
 influxdb-client>=1.38
 python-dotenv>=1.0
 psycopg2-binary>=2.9
+
+fastapi
+uvicorn[standard]
+influxdb-client
+python-dotenv
+

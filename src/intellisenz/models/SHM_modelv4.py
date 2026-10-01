@@ -404,6 +404,19 @@ def run_all(rfl_df: pd.DataFrame, cfg: Cfg4 | None = None, out_dir="runs_v4", rf
     return res
 
 
+def _json_safe(obj):
+    """Recursively replace NaN/Infinity with None. json.dumps writes bare NaN/Infinity tokens by
+    default, which Python's json module can read back but which are NOT valid JSON and every
+    browser's JSON.parse correctly rejects -- this is what breaks the dashboard without this step."""
+    if isinstance(obj, float):
+        return None if (np.isnan(obj) or np.isinf(obj)) else obj
+    if isinstance(obj, dict):
+        return {k: _json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_json_safe(v) for v in obj]
+    return obj
+
+
 def export_dashboard_json(res: dict, out_dir: str, path: str = "dashboard_data.json") -> str:
     """Build ONE real-data JSON for a dashboard: every number here is read back from the CSVs this
     pipeline already wrote (segments/events summaries + the actual per-session *_sessions.csv rows).
@@ -438,7 +451,7 @@ def export_dashboard_json(res: dict, out_dir: str, path: str = "dashboard_data.j
             name = row["segment"]
             segments.append({"id": name, "kind": "tilt", "unit": "deg", **row.to_dict(),
                              "events": ev_df[ev_df["segment"] == name].to_dict(orient="records") if not ev_df.empty else [],
-                             "sessions": load_sessions(out / "rfm" / f"{name}_sessions.csv", "tilt")})
+                             "session_rows": load_sessions(out / "rfm" / f"{name}_sessions.csv", "tilt")})
 
     seg_df = safe_csv(out / "load_segments.csv")
     if not seg_df.empty:
@@ -448,7 +461,7 @@ def export_dashboard_json(res: dict, out_dir: str, path: str = "dashboard_data.j
             match = ev_df[(ev_df["node"] == row["node"]) & (ev_df["cell"] == row["cell"])] if not ev_df.empty else pd.DataFrame()
             segments.append({"id": name, "kind": "load", "unit": "kg", **row.to_dict(),
                              "events": match.to_dict(orient="records"),
-                             "sessions": load_sessions(out / f"{row['node']}_{row['cell']}_sessions.csv", "load")})
+                             "session_rows": load_sessions(out / f"{row['node']}_{row['cell']}_sessions.csv", "load")})
 
     payload = {"generated_from": "SHM_modelv4.py run_all() output -- no fabricated or reconstructed values",
               "temperature_data_available": False,
@@ -457,7 +470,7 @@ def export_dashboard_json(res: dict, out_dir: str, path: str = "dashboard_data.j
               "nodes": safe_csv(out / "nodes.csv").to_dict(orient="records"),
               "segments": segments}
     dest = out / path
-    dest.write_text(json.dumps(payload, indent=2, default=str))
+    dest.write_text(json.dumps(_json_safe(payload), indent=2, default=str))
     return str(dest)
 
 

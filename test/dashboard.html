@@ -127,7 +127,7 @@ function segDetail(s){
 function drawSegChart(s){
   const cv=$('#segChart');if(!cv)return;const dp=devicePixelRatio||1,W=cv.clientWidth,H=220;cv.width=W*dp;cv.height=H*dp;
   const x=cv.getContext('2d');x.setTransform(dp,0,0,dp,0,0);
-  const rows=s.sessions.filter(r=>r.t);
+  const rows=(s.session_rows||[]).filter(r=>r.t);
   if(!rows.length){x.fillStyle='#8593a3';x.fillText('No session rows for this segment.',10,20);return}
   const ts=rows.map(r=>new Date(r.t).getTime()),a=Math.min(...ts),b=Math.max(...ts)||a+1;
   const yk=s.kind=='tilt'?'u':'kg',ys=rows.map(r=>r[yk]).filter(isFinite);

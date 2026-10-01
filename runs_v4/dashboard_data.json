@@ -23,16 +23,23 @@
       "kind": "tilt",
       "unit": "deg",
       "segment": "RFM_0002_s1",
-      "sessions": [
+      "sessions": 6,
+      "monitored": 4,
+      "unarmed/settling": 2,
+      "events": [],
+      "drift_sessions": 0,
+      "sigma_q_deg": 0.02,
+      "low_sensitivity": false,
+      "session_rows": [
         {
           "t": "2026-09-21 12:11:32.944575+00:00",
           "u": 0.0083087161813396,
           "v": 0.0191530361648409,
           "n": 4,
           "state": "SETTLING",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         },
         {
           "t": "2026-09-21 12:41:55.799103+00:00",
@@ -40,9 +47,9 @@
           "v": 0.0262953931296058,
           "n": 5,
           "state": "SETTLING",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         },
         {
           "t": "2026-09-21 13:25:53.379217+00:00",
@@ -50,9 +57,9 @@
           "v": 0.0016314744138358,
           "n": 17,
           "state": "BASE",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         },
         {
           "t": "2026-09-21 15:28:10.972454+00:00",
@@ -60,9 +67,9 @@
           "v": 0.0052111580809826,
           "n": 18,
           "state": "BASE",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         },
         {
           "t": "2026-09-21 17:36:49.644907+00:00",
@@ -70,9 +77,9 @@
           "v": 0.0044848793192399,
           "n": 30,
           "state": "BASE",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         },
         {
           "t": "2026-09-21 21:46:32.038051+00:00",
@@ -80,33 +87,34 @@
           "v": 0.0307378473122748,
           "n": 8,
           "state": "BASE",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         }
-      ],
-      "monitored": 4,
-      "unarmed/settling": 2,
-      "events": [],
-      "drift_sessions": 0,
-      "sigma_q_deg": 0.02,
-      "low_sensitivity": false
+      ]
     },
     {
       "id": "RFM_0004_s1",
       "kind": "tilt",
       "unit": "deg",
       "segment": "RFM_0004_s1",
-      "sessions": [
+      "sessions": 3,
+      "monitored": 0,
+      "unarmed/settling": 3,
+      "events": [],
+      "drift_sessions": 0,
+      "sigma_q_deg": 0.02,
+      "low_sensitivity": false,
+      "session_rows": [
         {
           "t": "2026-09-21 11:59:02.226191+00:00",
           "u": 0.0301734098880054,
           "v": -0.0626919995130857,
           "n": 5,
           "state": "UNARMED",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         },
         {
           "t": "2026-09-21 12:33:15.173239+00:00",
@@ -114,9 +122,9 @@
           "v": 0.0107778127230357,
           "n": 22,
           "state": "UNARMED",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         },
         {
           "t": "2026-09-21 14:41:22.729146+00:00",
@@ -124,57 +132,59 @@
           "v": 0.0068828146573459,
           "n": 78,
           "state": "UNARMED",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         }
-      ],
-      "monitored": 0,
-      "unarmed/settling": 3,
-      "events": [],
-      "drift_sessions": 0,
-      "sigma_q_deg": 0.02,
-      "low_sensitivity": false
+      ]
     },
     {
       "id": "RFM_0004_s2",
       "kind": "tilt",
       "unit": "deg",
       "segment": "RFM_0004_s2",
-      "sessions": [
+      "sessions": 1,
+      "monitored": 0,
+      "unarmed/settling": 1,
+      "events": [],
+      "drift_sessions": 0,
+      "sigma_q_deg": 0.02,
+      "low_sensitivity": false,
+      "session_rows": [
         {
           "t": "2026-09-23 05:18:17.113262+00:00",
           "u": -0.0203201734636422,
           "v": -0.0202512011626032,
           "n": 92,
           "state": "UNARMED",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         }
-      ],
-      "monitored": 0,
-      "unarmed/settling": 1,
-      "events": [],
-      "drift_sessions": 0,
-      "sigma_q_deg": 0.02,
-      "low_sensitivity": false
+      ]
     },
     {
       "id": "RFM_0005_s2",
       "kind": "tilt",
       "unit": "deg",
       "segment": "RFM_0005_s2",
-      "sessions": [
+      "sessions": 2,
+      "monitored": 0,
+      "unarmed/settling": 2,
+      "events": [],
+      "drift_sessions": 0,
+      "sigma_q_deg": 0.02,
+      "low_sensitivity": false,
+      "session_rows": [
         {
           "t": "2026-09-23 04:30:03.884009+00:00",
           "u": -0.1454140464728106,
           "v": -1.1767297707064337,
           "n": 29,
           "state": "UNARMED",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         },
         {
           "t": "2026-09-23 07:24:16.862522+00:00",
@@ -182,41 +192,36 @@
           "v": 0.1072663802396909,
           "n": 49,
           "state": "UNARMED",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         }
-      ],
-      "monitored": 0,
-      "unarmed/settling": 2,
-      "events": [],
-      "drift_sessions": 0,
-      "sigma_q_deg": 0.02,
-      "low_sensitivity": false
+      ]
     },
     {
       "id": "RFM_0006_s5",
       "kind": "tilt",
       "unit": "deg",
       "segment": "RFM_0006_s5",
-      "sessions": [
+      "sessions": 1,
+      "monitored": 0,
+      "unarmed/settling": 1,
+      "events": [],
+      "drift_sessions": 0,
+      "sigma_q_deg": 0.02,
+      "low_sensitivity": false,
+      "session_rows": [
         {
           "t": "2026-09-29 13:18:15.395759+00:00",
           "u": 0.0289798304000481,
           "v": -0.0486043696941154,
           "n": 222,
           "state": "UNARMED",
-          "shift_deg": NaN,
-          "z": NaN,
-          "drift_deg_day": NaN
+          "shift_deg": null,
+          "z": null,
+          "drift_deg_day": null
         }
-      ],
-      "monitored": 0,
-      "unarmed/settling": 1,
-      "events": [],
-      "drift_sessions": 0,
-      "sigma_q_deg": 0.02,
-      "low_sensitivity": false
+      ]
     }
   ]
 }

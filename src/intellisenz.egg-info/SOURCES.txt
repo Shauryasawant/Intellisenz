@@ -13,6 +13,9 @@ src/intellisenz/features/__init__.py
 src/intellisenz/inference/__init__.py
 src/intellisenz/models/SHM_models.py
 src/intellisenz/models/SHM_modelv2.py
+src/intellisenz/models/SHM_modelv3.py
+src/intellisenz/models/SHM_modelv4.py
+src/intellisenz/models/SHM_temperature.py
 src/intellisenz/models/__init__.py
 src/intellisenz/models/baseline.py
 src/intellisenz/preprocess/__init__.py

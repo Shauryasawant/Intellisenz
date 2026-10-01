@@ -1,0 +1,168 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SHM Dashboard (real data)</title>
+<style>
+:root{color-scheme:dark;--bg:#0d1117;--pn:#141a22;--ln:#2a3441;--tx:#d7dee7;--mu:#8593a3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.4 system-ui,-apple-system,Segoe UI,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:10px 14px;background:#10161e;border-bottom:1px solid var(--ln)}
+h1{font-size:15px;margin:0}h1 small{color:var(--mu);font-weight:400}
+nav{display:flex;gap:2px;overflow-x:auto}nav button{background:none;border:0;color:var(--mu);padding:7px 11px;cursor:pointer;border-bottom:2px solid transparent;font:inherit;white-space:nowrap}
+nav button.on{color:var(--tx);border-color:#4aa3df}
+main{padding:12px 14px;max-width:1400px;margin:auto}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:10px}
+.pnl,.kp{background:var(--pn);border:1px solid var(--ln);border-radius:6px;padding:10px}
+.kp b{font-size:20px;display:block}.kp span{color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.04em}.kp small{color:var(--mu);display:block}
+.g2{display:grid;grid-template-columns:260px 1fr;gap:10px}
+@media(max-width:860px){.g2{grid-template-columns:1fr}}
+h3{margin:0 0 8px;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{padding:5px 7px;border-bottom:1px solid #212b37;text-align:left;white-space:nowrap}th{color:var(--mu);font-weight:500}
+.ch{display:inline-block;padding:1px 7px;border-radius:9px;border:1px solid var(--c);color:var(--c);font-size:11px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:6px}
+button.b{background:#0f151c;color:var(--tx);border:1px solid var(--ln);border-radius:4px;padding:6px 12px;font:inherit;cursor:pointer}
+button.b:hover{border-color:#4aa3df}button.b:disabled{opacity:.5;cursor:default}
+.it{padding:6px 8px;border:1px solid transparent;border-radius:4px;cursor:pointer}.it:hover{background:#19212b}.it.on{border-color:#4aa3df;background:#182430}
+.it small{color:var(--mu);display:block}
+canvas{display:block;width:100%;height:220px;background:#0f151c;border-radius:4px}
+.wn{border-left:3px solid var(--c);padding:6px 9px;margin-bottom:6px;background:#10161e}
+.status{font-size:12px;color:var(--mu)}
+.log{white-space:pre-wrap;font:11px/1.4 ui-monospace,monospace;background:#0a0e13;border:1px solid var(--ln);border-radius:4px;padding:8px;max-height:220px;overflow:auto}
+.ft{color:var(--mu);font-size:11px;padding:8px 14px 16px;max-width:1400px;margin:auto}
+</style></head><body>
+<header>
+  <h1>SHM Dashboard <small>· real data only, from the engine's own output</small></h1>
+  <nav id="nv"></nav>
+  <div style="flex:1"></div>
+  <span class="status" id="statusline">no data loaded</span>
+  <button class="b" id="refreshBtn">⟳ Refresh live data</button>
+</header>
+<main id="m"></main>
+<div class="ft" id="footnote"></div>
+<script>
+const $=s=>document.querySelector(s);
+const C={ok:'#3fb56b',att:'#e3b341',warn:'#f0883e',evt:'#f05252',off:'#6b7686',dq:'#a371f7',set:'#4a7fc9'};
+const SL={BASE:'Baseline',OK:'Normal',HIT:'Pending confirmation',EVENT:'Detected change',ALARM:'Alarm (unacknowledged)',DRIFT:'Drift',SETTLING:'Settling',UNARMED:'Unarmed'};
+const SC={BASE:'set',OK:'ok',HIT:'att',EVENT:'evt',ALARM:'evt',DRIFT:'warn',SETTLING:'set',UNARMED:'off'};
+const nf=(x,d=3)=>x==null||x===''||!isFinite(x)?'–':(+x).toFixed(d);
+const chip=(c,t)=>`<span class="ch" style="--c:${C[c]||c}">${t}</span>`;
+const fmt=t=>{if(!t)return'–';const d=new Date(t);return isNaN(d)?t:d.toISOString().slice(0,16).replace('T',' ')};
+
+let DATA=null, selId=null, cur='overview';
+const PG={overview:'Overview',tilt:'Tilt segments',load:'Load monitoring',events:'Events',quality:'Data quality'};
+$('#nv').innerHTML=Object.entries(PG).map(([k,v])=>`<button data-p="${k}">${v}</button>`).join('');
+$('#nv').onclick=e=>{if(e.target.dataset.p){cur=e.target.dataset.p;render()}};
+
+async function loadData(){
+  try{
+    const r=await fetch('/api/dashboard_data');
+    if(!r.ok){DATA=null;$('#statusline').textContent='no data yet — click Refresh';render();return}
+    DATA=await r.json();
+    const tilt=DATA.segments.filter(s=>s.kind=='tilt'),load=DATA.segments.filter(s=>s.kind=='load');
+    if(!selId&&tilt.length)selId=tilt[0].id; else if(!selId&&load.length)selId=load[0].id;
+    $('#statusline').textContent=`${DATA.segments.length} segments loaded`;
+    render();
+  }catch(e){$('#statusline').textContent='failed to load data: '+e;render()}
+}
+
+$('#refreshBtn').onclick=async()=>{
+  const btn=$('#refreshBtn');btn.disabled=true;btn.textContent='⟳ Running pipeline…';
+  $('#statusline').textContent='running data.py → load_timescale.py → recompute…';
+  try{
+    const r=await fetch('/api/refresh',{method:'POST'});
+    const res=await r.json();
+    showRefreshLog(res);
+    if(res.ok)await loadData();
+  }catch(e){showRefreshLog({ok:false,steps:[],message:'Could not reach refresh_server.py: '+e})}
+  btn.disabled=false;btn.textContent='⟳ Refresh live data';
+};
+function showRefreshLog(res){
+  const box=document.createElement('div');box.className='pnl';box.style.marginBottom='10px';
+  box.innerHTML=`<h3>${res.ok?'Refresh succeeded':'Refresh failed'}</h3><div class="wn" style="--c:${res.ok?C.ok:C.evt}">${res.message||''}</div>
+    ${res.steps.map(s=>`<div class="wn" style="--c:${s.ok?C.ok:(s.fatal?C.evt:C.att)}"><b>${s.step}</b> — ${s.ok?'ok':'failed'} (${s.seconds}s)${s.log?`<div class="log">${s.log.replace(/</g,'&lt;')}</div>`:''}</div>`).join('')}`;
+  $('#m').prepend(box);
+}
+
+function render(){
+  if(!DATA){$('#m').innerHTML='<div class="pnl">No data yet. Click <b>Refresh live data</b> above to run the pipeline for the first time.</div>';$('#footnote').textContent='';return}
+  ({overview:pOverview,tilt:()=>pSegments('tilt'),load:()=>pSegments('load'),events:pEvents,quality:pQuality})[cur]();
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.p==cur));
+  $('#footnote').textContent='Every number on this page is read back from the engine\'s own CSV/JSON output — nothing here is reconstructed, interpolated, or randomly generated. No temperature channel exists anywhere in this dataset, so no temperature model is shown.';
+}
+
+function pOverview(){
+  const segs=DATA.segments,tilt=segs.filter(s=>s.kind=='tilt'),load=segs.filter(s=>s.kind=='load');
+  const events=segs.flatMap(s=>s.events.map(e=>({...e,seg:s.id,kind:s.kind})));
+  const low=segs.filter(s=>s.low_sensitivity||s.sigma_q_kg>0.5).length;
+  const glitchy=DATA.glitch_summary.filter(g=>g.pct>5).length;
+  const K=(l,v,s,c)=>`<div class="kp" style="border-top:3px solid ${C[c]}"><span>${l}</span><b>${v}</b><small>${s}</small></div>`;
+  $('#m').innerHTML=`<div class="k">
+    ${K('Tilt segments',tilt.length,`${tilt.filter(s=>s.events.length).length} with detected changes`,'ok')}
+    ${K('Load channels',load.length,`${load.filter(s=>s.events.length).length} with detected changes`,'ok')}
+    ${K('Total real events',events.length,'across all segments','evt')}
+    ${K('Low-confidence segments',low,'high noise floor or low sensitivity','dq')}
+    ${K('Glitchy load cells',glitchy,'>5% suspected raw/kg mismatch','dq')}
+    ${K('Fused tilt+load events',DATA.fused_events.length,'only where both channels exist on one node','warn')}
+  </div>
+  <div class="pnl"><h3>All segments — click to open</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px">
+    ${segs.map(s=>`<div class="it" onclick="openSeg('${s.id}')"><span class="dot" style="--c:${segColor(s)}"></span>${s.id}<small>${s.kind=='tilt'?'tilt':'load'} · ${s.monitored}/${s.sessions} monitored · ${s.events.length} events</small></div>`).join('')}
+  </div></div>`;
+}
+function segColor(s){if(s.events.length)return C.evt;if(s.low_sensitivity||s.sigma_q_kg>0.5)return C.dq;if(s['unarmed/settling']/Math.max(1,s.sessions)>=0.5)return C.set;return C.ok}
+window.openSeg=id=>{selId=id;const s=DATA.segments.find(x=>x.id==id);cur=s.kind=='tilt'?'tilt':'load';render()};
+
+function pSegments(kind){
+  const list=DATA.segments.filter(s=>s.kind==kind);
+  if(!list.find(s=>s.id==selId))selId=list[0]?.id;
+  const s=list.find(x=>x.id==selId);
+  $('#m').innerHTML=`<div class="g2"><div class="pnl">${list.map(x=>`<div class="it${x.id==selId?' on':''}" onclick="openSeg('${x.id}')">${x.id}<small>${x.monitored}/${x.sessions} monitored · ${x.events.length} events</small></div>`).join('')||'<small>None.</small>'}</div>
+  <div class="pnl">${s?segDetail(s):'<small>Select a segment.</small>'}</div></div>`;
+  if(s)drawSegChart(s);
+}
+function segDetail(s){
+  const sigLabel=s.kind=='tilt'?`σ_q ${nf(s.sigma_q_deg)}°`:`σ_q ${nf(s.sigma_q_kg)} kg`;
+  return `<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px"><b style="font-size:15px">${s.id}</b>${chip(segColor(s),s.events.length?'Has detected changes':'Monitoring')}<span class="status">${s.monitored}/${s.sessions} sessions monitored · ${sigLabel}${s.low_sensitivity?' · LOW SENSITIVITY':''}</span></div>
+  <canvas id="segChart"></canvas>
+  ${s.events.length?`<h3 style="margin-top:10px">Events on this segment</h3>${s.events.map(e=>`<div class="wn" style="--c:${C.evt}"><b>${e.kind}</b> at ${e.when_IST} IST — shift ${nf(e.shift_deg??e.shift_kg)} ${s.unit}${e.drift_deg_day||e.drift_kg_day?` · drift ${nf(e.drift_deg_day??e.drift_kg_day)} ${s.unit}/day`:''}<br><small>Statistical detection — requires field verification.</small></div>`).join('')}`:''}`;
+}
+function drawSegChart(s){
+  const cv=$('#segChart');if(!cv)return;const dp=devicePixelRatio||1,W=cv.clientWidth,H=220;cv.width=W*dp;cv.height=H*dp;
+  const x=cv.getContext('2d');x.setTransform(dp,0,0,dp,0,0);
+  const rows=s.sessions.filter(r=>r.t);
+  if(!rows.length){x.fillStyle='#8593a3';x.fillText('No session rows for this segment.',10,20);return}
+  const ts=rows.map(r=>new Date(r.t).getTime()),a=Math.min(...ts),b=Math.max(...ts)||a+1;
+  const yk=s.kind=='tilt'?'u':'kg',ys=rows.map(r=>r[yk]).filter(isFinite);
+  let lo=Math.min(...ys),hi=Math.max(...ys);if(!isFinite(lo)){lo=0;hi=1}if(hi-lo<1e-9)hi=lo+1;const pad=(hi-lo)*.1;lo-=pad;hi+=pad;
+  const Lm=46,Rm=10,X=t=>Lm+(t-a)/(b-a)*(W-Lm-Rm),Y=v=>10+(hi-v)/(hi-lo)*(H-30);
+  x.strokeStyle='#212b37';x.fillStyle='#8593a3';x.font='10px system-ui';x.textAlign='right';
+  for(let i=0;i<3;i++){const v=lo+(hi-lo)*i/2,py=Y(v);x.beginPath();x.moveTo(Lm,py);x.lineTo(W-Rm,py);x.stroke();x.fillText(v.toFixed(2),Lm-4,py+3)}
+  // state-colored background bars per session
+  rows.forEach((r,i)=>{const t0=ts[i],t1=ts[i+1]??t0+3600e3;x.fillStyle=C[SC[r.state]]||C.off;x.globalAlpha=.18;x.fillRect(X(t0),10,Math.max(1,X(t1)-X(t0)),H-40);x.globalAlpha=1});
+  // line
+  x.strokeStyle='#4aa3df';x.lineWidth=1.5;x.beginPath();let started=false;
+  rows.forEach((r,i)=>{const v=r[yk];if(!isFinite(v)){started=false;return}const px=X(ts[i]),py=Y(v);started?x.lineTo(px,py):x.moveTo(px,py);started=true});
+  x.stroke();
+  rows.forEach((r,i)=>{const v=r[yk];if(!isFinite(v))return;x.fillStyle=C[SC[r.state]]||'#4aa3df';x.beginPath();x.arc(X(ts[i]),Y(v),2.5,0,7);x.fill()});
+  x.fillStyle='#8593a3';x.textAlign='left';x.fillText(new Date(a).toISOString().slice(0,10),Lm,H-4);
+  x.textAlign='right';x.fillText(new Date(b).toISOString().slice(0,10),W-Rm,H-4);
+}
+
+function pEvents(){
+  const rows=DATA.segments.flatMap(s=>s.events.map(e=>({...e,seg:s.id,unit:s.unit})));
+  rows.sort((a,b)=>(b.when_IST||'').localeCompare(a.when_IST||''));
+  $('#m').innerHTML=`<div class="pnl"><h3>All detected events — require field verification</h3><div class="tw"><table><tr><th>Segment</th><th>Type</th><th>When (IST)</th><th>Shift</th><th>Drift/day</th></tr>
+  ${rows.map(e=>`<tr style="cursor:pointer" onclick="openSeg('${e.seg}')"><td>${e.seg}</td><td>${chip(e.kind=='EVENT'?'evt':'warn',e.kind)}</td><td>${e.when_IST}</td><td>${nf(e.shift_deg??e.shift_kg)} ${e.unit}</td><td>${nf(e.drift_deg_day??e.drift_kg_day)}</td></tr>`).join('')||'<tr><td colspan=5>No events.</td></tr>'}
+  </table></div></div>
+  <div class="pnl" style="margin-top:10px"><h3>Fused tilt+load events</h3>${DATA.fused_events.length?`<div class="tw"><table><tr><th>Node</th><th>Segment</th><th>When (IST)</th><th>Tilt status</th><th>Load state</th><th>Fused status</th></tr>${DATA.fused_events.map(f=>`<tr><td>${f.node}</td><td>${f.segment}</td><td>${f.when_IST}</td><td>${f.tilt_status}</td><td>${f.load_state}</td><td>${chip('warn',f.fused_status)}</td></tr>`).join('')}</table></div>`:'<small>None — only possible where a node has both a working tilt sensor and a load cell (see Data Quality).</small>'}</div>`;
+}
+
+function pQuality(){
+  const segs=DATA.segments;
+  $('#m').innerHTML=`<div class="pnl"><h3>Nodes</h3><div class="tw"><table><tr><th>Node</th><th>Rows</th><th>IMU-valid rows</th><th>Has tilt?</th></tr>
+  ${DATA.nodes.map(n=>`<tr><td>${n.node}</td><td>${n.rows}</td><td>${n.imu_valid_rows}</td><td>${n.has_tilt?'yes':'no'}</td></tr>`).join('')}</table></div></div>
+  <div class="pnl" style="margin-top:10px"><h3>Segment health</h3><div class="tw"><table><tr><th>Segment</th><th>Sessions</th><th>Monitored</th><th>Unarmed/settling</th><th>σ_q</th><th>Flags</th></tr>
+  ${segs.map(s=>`<tr style="cursor:pointer" onclick="openSeg('${s.id}')"><td>${s.id}</td><td>${s.sessions}</td><td>${s.monitored}</td><td>${s['unarmed/settling']}</td><td>${nf(s.sigma_q_deg??s.sigma_q_kg)}</td><td>${s.low_sensitivity?chip('dq','low sensitivity'):''}</td></tr>`).join('')}</table></div></div>
+  <div class="pnl" style="margin-top:10px"><h3>Suspected load-cell sensor glitches</h3>${DATA.glitch_summary.length?`<div class="tw"><table><tr><th>Node</th><th>Cell</th><th>Glitch windows</th><th>Total windows</th><th>%</th></tr>${DATA.glitch_summary.map(g=>`<tr><td>${g.node}</td><td>${g.cell}</td><td>${g.suspected_glitch_windows}</td><td>${g.total_windows}</td><td>${g.pct}%</td></tr>`).join('')}</table></div>`:'<small>None.</small>'}</div>`;
+}
+
+loadData();
+</script></body></html>

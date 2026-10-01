@@ -1,0 +1,22 @@
+series,channel,sessions,temp_cov_pct,tau_h,gradient_term,kT_deg/C,kG_deg/C,t_kT,r2,trusted,drift_raw_deg/day,drift_temp_free_deg/day,drift_temp_share_pct,events_raw,events_temp_free,note,kT_kg/C,kG_kg/C,drift_raw_kg/day,drift_temp_free_kg/day
+RFM_0001_s14,u,14,100,0.25,True,-0.0188,2.886,-2.0,0.98,False,-0.572,-0.456,,1,1,implausibly large sensitivity 2.886 > physical bound 0.15,,,,
+RFM_0001_s14,v,14,100,0.25,True,-0.2173,5.5449,-4.6,0.45,False,-1.919,-1.224,,1,1,implausibly large sensitivity 5.545 > physical bound 0.15,,,,
+RFM_0002_s4,u,45,100,3.0,False,0.0002,0.0,0.2,0.03,False,0.036,0.036,,3,3,temperature explains only 3% of variance,,,,
+RFM_0002_s4,v,45,100,3.0,False,-0.0037,0.0,-1.0,0.15,False,0.018,0.019,,3,3,temperature explains only 15% of variance,,,,
+RFM_0003_s3,u,17,100,6.0,True,-0.0288,0.0177,-6.1,0.86,False,0.202,0.181,,1,1,temperature swing 2.8 C < 3.0 C,,,,
+RFM_0003_s3,v,17,100,6.0,True,-0.0123,-0.0191,-2.6,0.88,False,-0.14,-0.161,,1,1,temperature swing 2.8 C < 3.0 C,,,,
+RFM_0004_s2,u,19,100,8.0,True,0.0184,-0.0077,6.1,0.85,False,0.116,0.12,,1,1,temperature swing 2.9 C < 3.0 C,,,,
+RFM_0004_s2,v,19,100,8.0,True,0.0457,-0.0178,2.4,0.68,False,-0.644,-0.65,,1,1,temperature swing 2.9 C < 3.0 C,,,,
+RFM_0004_s3,u,11,100,2.0,True,0.0412,0.138,5.5,0.9,True,-0.365,-0.344,6.0,0,0,,,,,
+RFM_0004_s3,v,11,100,2.0,True,0.2559,0.6385,3.5,0.48,False,0.213,0.273,,0,0,implausibly large sensitivity 0.638 > physical bound 0.15,,,,
+RFM_0004_s4,u,1,100,0.25,False,0.0,0.0,,0.0,False,,,,0,0,only 1 sessions with temperature (need 8),,,,
+RFM_0004_s4,v,1,100,0.25,False,0.0,0.0,,0.0,False,,,,0,0,only 1 sessions with temperature (need 8),,,,
+RFM_0005_s4,u,2,100,0.25,False,0.0,0.0,,0.0,False,,,,0,0,only 2 sessions with temperature (need 8),,,,
+RFM_0005_s4,v,2,100,0.25,False,0.0,0.0,,0.0,False,,,,0,0,only 2 sessions with temperature (need 8),,,,
+D001_LC_B,kg,8,75,0.25,False,,,,0.0,False,,,,0,0,only 6 sessions with temperature (need 8),0.0,0.0,,
+D012_LC_A,kg,2,100,0.25,False,,,,0.0,False,,,,0,0,only 2 sessions with temperature (need 8),0.0,0.0,,
+D012_LC_B,kg,2,100,0.25,False,,,,0.0,False,,,,0,0,only 2 sessions with temperature (need 8),0.0,0.0,,
+RFL_01_tilt_s7,u,2,100,0.25,False,0.0,0.0,,0.0,False,,,,0,0,only 2 sessions with temperature (need 8),,,,
+RFL_01_tilt_s7,v,2,100,0.25,False,0.0,0.0,,0.0,False,,,,0,0,only 2 sessions with temperature (need 8),,,,
+RFL_01_LC_A,kg,40,68,0.25,False,,,-0.0,0.0,False,,,,1,1,temperature swing 2.4 C < 3.0 C,-0.0,0.0,-0.0,-0.0
+RFL_01_LC_B,kg,40,68,3.0,False,,,-0.0,0.0,False,,,,0,0,temperature swing 2.5 C < 3.0 C,-0.0,0.0,0.0,0.0

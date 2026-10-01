@@ -1,0 +1,23 @@
+{
+  "cfg": {
+    "window_s": 300,
+    "session_gap_s": 120,
+    "min_n_load": 3,
+    "min_win_load": 2,
+    "arm_sessions": 4,
+    "arm_min_h": 6.0,
+    "arm_tol_kg": null,
+    "ref_k": 6,
+    "floor_kg": 0.5,
+    "z_thr": 5.0,
+    "sigma_min_kg": 0.05,
+    "persist_sessions": 2,
+    "drift_h": 168.0,
+    "drift_min_sessions": 5,
+    "drift_floor_kg_day": 1.0,
+    "drift_q": 0.995,
+    "min_valid_imu_rows": 200,
+    "fuse_tolerance": "10min",
+    "tz": "Asia/Kolkata"
+  }
+}

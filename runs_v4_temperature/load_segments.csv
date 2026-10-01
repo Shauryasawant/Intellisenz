@@ -1,0 +1,6 @@
+node,cell,sessions,monitored,unarmed/settling,events,drift_sessions,sigma_q_kg
+D001,LC_B,8,4,4,0,0,0.05
+D012,LC_A,2,0,2,0,0,0.05
+D012,LC_B,2,0,2,0,0,0.05
+RFL_01,LC_A,40,23,17,1,0,0.06
+RFL_01,LC_B,40,23,17,0,0,0.933

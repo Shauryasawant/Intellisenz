@@ -404,3 +404,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#PYTHONPATH=src python -m intellisenz.models.SHM_modelv3 --csv influx_data.csv --out runs_v3

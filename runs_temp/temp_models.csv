@@ -1,0 +1,13 @@
+series,lag_h,k_u_deg_per_C,r2_u,drift_u_deg_per_day_raw,drift_u_deg_per_day_temp_free,trusted_u,note_u,k_v_deg_per_C,r2_v,drift_v_deg_per_day_raw,drift_v_deg_per_day_temp_free,trusted_v,note_v,events_raw,events_after_temp_removed,k_kg_kg_per_C,r2_kg,drift_kg_kg_per_day_raw,drift_kg_kg_per_day_temp_free,trusted_kg,note_kg
+RFM_0001_s14,4,-0.1652,0.94,-0.572,-0.244,True,,-0.5291,0.85,-1.919,-0.849,True,,1,0,,,,,,
+RFM_0002_s4,1,-0.0005,0.0,0.029,0.029,False,temperature explains only 0% of variance,-0.0049,0.26,0.012,0.011,True,,3,3,,,,,,
+RFM_0003_s3,0,0.0094,0.99,0.202,0.227,True,,-0.019,0.93,-0.14,-0.168,True,,1,1,,,,,,
+RFM_0004_s2,3,0.0086,0.47,0.116,0.115,True,,0.0063,0.34,-0.644,-0.609,True,,1,1,,,,,,
+RFM_0004_s3,0,0.0726,0.0,-0.377,-0.36,False,temperature explains only 0% of variance,0.1359,0.31,0.078,0.07,True,,0,1,,,,,,
+RFM_0004_s4,0,0.0,0.0,,,False,only 1 sessions with temperature (need 8),0.0,0.0,,,False,only 1 sessions with temperature (need 8),0,0,,,,,,
+RFM_0005_s4,0,0.0,0.0,,,False,only 2 sessions with temperature (need 8),0.0,0.0,,,False,only 2 sessions with temperature (need 8),0,0,,,,,,
+D001_LC_B,0,,,,,,,,,,,,,0,0,0.0,0.0,,,False,only 6 sessions with temperature (need 8)
+D012_LC_A,0,,,,,,,,,,,,,0,0,0.0,0.0,,,False,only 2 sessions with temperature (need 8)
+D012_LC_B,0,,,,,,,,,,,,,0,0,0.0,0.0,,,False,only 2 sessions with temperature (need 8)
+RFL_01_LC_A,0,,,,,,,,,,,,,1,1,-0.0,0.5,-0.0,-0.0,False,temperature swing 2.5 C < 3.0 C
+RFL_01_LC_B,0,,,,,,,,,,,,,0,0,-0.3101,0.0,0.0,0.115,False,temperature swing 2.5 C < 3.0 C

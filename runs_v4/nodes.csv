@@ -1,0 +1,3 @@
+node,rows,imu_valid_rows,has_tilt
+RFL_01,104,70,False
+RFM_0003,13,11,False

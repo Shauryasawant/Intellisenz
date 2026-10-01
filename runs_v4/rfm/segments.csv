@@ -1,0 +1,6 @@
+segment,sessions,monitored,unarmed/settling,events,drift_sessions,sigma_q_deg,low_sensitivity
+RFM_0002_s1,6,4,2,0,0,0.02,False
+RFM_0004_s1,3,0,3,0,0,0.02,False
+RFM_0004_s2,1,0,1,0,0,0.02,False
+RFM_0005_s2,2,0,2,0,0,0.02,False
+RFM_0006_s5,1,0,1,0,0,0.02,False

@@ -1,0 +1,51 @@
+{
+  "cfg": {
+    "window_s": 300,
+    "min_n": 20,
+    "session_gap_s": 120,
+    "min_win": 2,
+    "seg_tol_deg": 2.0,
+    "min_session_n": 30,
+    "settle_h": 6.0,
+    "sample_norm_tol": 0.3,
+    "ref_dir_h": 24.0,
+    "min_seg_windows": 60,
+    "arm_sessions": 4,
+    "arm_min_h": 6.0,
+    "arm_tol_deg": 0.25,
+    "ref_k": 6,
+    "floor_deg": 0.1,
+    "z_thr": 5.0,
+    "sigma_min": 0.02,
+    "persist_sessions": 2,
+    "drift_h": 48.0,
+    "drift_min_sessions": 5,
+    "drift_floor": 0.35,
+    "drift_q": 0.995,
+    "low_sens_sigma": 0.15,
+    "q": 0.995,
+    "persist": 2,
+    "norm_tol": 0.1,
+    "min_eval_sessions": 8,
+    "test_frac": 0.3,
+    "tz": "Asia/Kolkata",
+    "seed": 0
+  },
+  "deploy": {
+    "RFM_0002_s4": {
+      "epoch": 2,
+      "sigma_q": 0.02,
+      "drift_thr_deg_day": 0.35
+    },
+    "RFM_0003_s3": {
+      "epoch": 1,
+      "sigma_q": 0.0208,
+      "drift_thr_deg_day": 0.35
+    },
+    "RFM_0004_s3": {
+      "epoch": 0,
+      "sigma_q": 0.4711,
+      "drift_thr_deg_day": 0.35
+    }
+  }
+}
